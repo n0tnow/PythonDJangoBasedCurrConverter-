@@ -1,0 +1,96 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Currency Converter{% endblock %}
+
+{% block content %}
+<div class="container justify-content-center" style="margin-top: 120px;">
+    <div class="row justify-content-center" style="text-align: center;">
+        <div class="col-md-6">
+            <div class="card" style="background-color: ; border: 1px solid #ced4da; border-radius: 15px;">
+                <div class="card-header" style="background-color: #A439CC; color: #fff; border-bottom: 2px solid #0056b3; border-radius: 15px 15px 0 0;">
+                    <h5 class="card-title">Currency Converter</h5>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="fromCurrency" style="font-weight: bold;color: #2C2B2D ">From</label>
+                        <select class="form-control" id="fromCurrency" onChange="setCurrency(event, 'from')">
+                            {% for currency in currencies %}
+                            <option value="{{ currency.code }}">{{ currency.code }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="toCurrency" style="font-weight: bold;color: #2C2B2D">To</label>
+                        <select class="form-control" id="toCurrency" onChange="setCurrency(event, 'to')">
+                            {% for currency in currencies %}
+                            <option value="{{ currency.code }}">{{ currency.code }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="amount" style="font-weight: bold;color: #2C2B2D">Amount</label>
+                        <input type="number" class="form-control" id="amount">
+                    </div>
+                    <button class="btn btn-success btn-block" style="background-color: #28a745; border-color: #28a745;" onclick="convertCurrency()">Convert</button>
+                </div>
+                <div class="card-footer" style="background-color: #f8f9fa; border-top: 2px solid #ced4da; border-radius: 0 0 15px 15px;">
+                    <p class="fs-3" id="result"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<html>
+<script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+   
+
+
+{% endblock content %}
+
+{% block stylesheets %}
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+{% endblock stylesheets %}
+
+{% block javascripts %}
+<script>
+    
+    const { useState, useEffect } = React;
+    
+    
+   
+    const [currencies, setCurrencies] = useState([]);
+    const [fromCurrency, setFromCurrency] = useState('USD');
+    const [toCurrency, setToCurrency] = useState('USD');
+      
+       
+    useEffect(() => {
+        axios.get('http://localhost:8080/api/currencies')
+        .then(response => setCurrencies(response.data))
+        .catch(error => console.error('Error fetching currencies: ', error))
+    }, []);
+
+
+    
+      useFetchCurrenciesEffect(setCurrencies);
+    function setCurrency(event, type) {
+        if (type === 'from') {
+            setFromCurrency(event.target.value);
+        } else {
+            setToCurrency(event.target.value);
+        }
+    }
+
+    function convertCurrency() {
+        axios.get(`http://localhost:8080/api/convert/${fromCurrency}/${toCurrency}/${document.getElementById('amount').value}`)
+        .then(response => {
+            const convertedAmount = parseFloat(response.data.converted_amount).toLocaleString(undefined, {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+            });
+            document.getElementById('result').innerText = `${document.getElementById('amount').value} ${fromCurrency} = ${convertedAmount} ${toCurrency}`;
+        })
+        .catch(error => console.log('error converting currency:', error));
+    }
+</script>
+{% endblock javascripts %}

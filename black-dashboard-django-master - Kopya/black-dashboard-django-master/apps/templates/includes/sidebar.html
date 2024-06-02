@@ -1,0 +1,69 @@
+
+
+
+
+<div class="sidebar">
+    <!--
+      Tip 1: You can change the color of the sidebar using: data-color="blue | green | orange | red"
+    -->
+    <script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <div class="sidebar-wrapper">
+        <div class="logo">
+            <a href="/main.html" class="simple-text logo-mini">
+                c2c
+            </a>
+            <a href="/main.html" class="simple-text">
+                Curr Converter
+            </a>
+        </div>
+        <ul class="nav">
+            <li class="{% if 'index' in segment %} active {% endif %} ">
+                <a href="/">
+                    <i class="tim-icons icon-wallet-43"></i>
+                    <p>Converter</p>
+                </a>
+            </li>
+            
+            <li class="{% if 'map' in segment %} active {% endif %}">
+                <a href="/cryptoconverter.html">
+                    <i class="fa fa-bitcoin"></i>
+                    <p>Cyrpto Converter</p>
+                </a>
+            </li>
+            <li class="{% if 'tables' in segment %} active {% endif %}">
+                <a href="/tables.html">
+                    <i class="fas fa-chart-line"></i>
+                    <p>Cyrpto Table</p>
+                </a>
+            </li>
+            <li class="{% if 'notifications' in segment %} active {% endif %}">
+                <a href="/news.html">
+                    <i class="tim-icons icon-bell-55"></i>
+                    <p>News</p>
+                </a>
+            </li>
+            <li class="{% if 'typography' in segment %} active {% endif %}">
+                <a href="/charts.html">
+                    <i class="tim-icons icon-align-center"></i>
+                    <p>Graphs</p>
+                </a>
+            </li>
+            
+            
+            
+            <li class="{% if 'user' in segment %} active {% endif %}">
+                <a href="/user.html">
+                    <i class="tim-icons icon-single-02"></i>
+                    <p>User Profile</p>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'login' %}">
+                    <i class="tim-icons icon-button-power"></i>
+                    <p>Logout</p>
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>

@@ -1,0 +1,199 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Crypto Converter{% endblock %}
+
+{% block stylesheets %}
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<style>
+    .card-custom {
+        background-color: #333;
+        border: 1px solid #555;
+        border-radius: 15px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+        position: relative;
+        overflow: hidden;
+        color: #fff;
+        width: 100%;
+        max-width: 400px;
+        margin: 0 auto;
+        z-index: 1;
+    }
+    .card-header-custom {
+        background-color: #A439CC;
+        color: #fff;
+        border-bottom: 2px solid #0056b3;
+        border-radius: 15px 15px 0 0;
+        text-align: center;
+        z-index: 2;
+        position: relative;
+        font-size: 1.5em;
+        font-weight: bold;
+    }
+    .card-body-custom {
+        padding: 20px;
+        z-index: 2;
+        position: relative;
+    }
+    .form-control-custom {
+        font-size: smaller;
+        margin-bottom: 10px;
+        background-color: #555;
+        color: #fff;
+        border: 1px solid #777;
+        text-align: center;
+    }
+    .form-control-custom option {
+        background-color: #333;
+        color: #fff;
+    }
+    .btn-custom {
+        background-color: #28a745;
+        border-color: #28a745;
+        color: #fff;
+        font-weight: bold;
+    }
+    .btn-custom:hover {
+        background-color: #218838;
+        border-color: #1e7e34;
+        color: #fff;
+        text-shadow: 0px 0px 10px rgba(255, 255, 255, 0.7);
+    }
+    .btn-custom:focus {
+        outline: none;
+        box-shadow: none;
+        .card-footer-custom {
+            background-color: #444;
+            border-top: 2px solid #555;
+            border-radius: 0 0 15px 15px;
+            text-align: center;
+            color: #fff;
+            z-index: 2;
+            position: relative;
+        }
+        .card-custom::before, .card-custom::after {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            border-radius: 15px;
+            border: 2px solid transparent;
+            box-shadow: 0 0 30px 20px rgba(0, 255, 255, 0.7);
+            z-index: -1;
+            transition: all 0.5s;
+        }
+        .card-custom::before {
+            top: -50%;
+            left: -50%;
+            animation: borderAnimation 3s linear infinite;
+        }
+        .card-custom::after {
+            top: -50%;
+            right: -50%;
+            animation: borderAnimation 3s linear infinite reverse;
+        }
+        @keyframes borderAnimation {
+            0% {
+                box-shadow: 0 0 30px 10px rgba(0, 255, 255, 0.7);
+            }
+            50% {
+                box-shadow: 0 0 50px 30px rgba(0, 255, 255, 0.9);
+            }
+            100% {
+                box-shadow: 0 0 30px 10px rgba(0, 255, 255, 0.7);
+            }
+        }
+    </style>
+    {% endblock stylesheets %}
+    
+    {% block content %}
+    <div class="container justify-content-center" style="margin-top: 120px;">
+        <div class="row justify-content-center" style="text-align: center;">
+            <div class="col-md-6">
+                <div class="card card-custom">
+                    <div class="card-header card-header-custom">
+                        <h5 class="card-title" style="font-weight: bold; font-size: 20px;">Crypto Converter</h5>
+                    </div>
+                    <div class="card-body card-body-custom">
+                        <table class="table">
+                            <tbody>
+                                <tr>
+                                    <td style="font-weight: bold; color: #fff; font-size: 15px;">From</td>
+                                    <td>
+                                        <select class="form-control form-control-custom" id="fromCurrency">
+                                            <!-- Options will be added dynamically using JavaScript -->
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: bold; color: #fff; font-size: 15px;">To</td>
+                                    <td>
+                                        <select class="form-control form-control-custom" id="toCurrency">
+                                            <!-- Options will be added dynamically using JavaScript -->
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: bold; color: #fff; font-size: 15px;">Amount</td>
+                                    <td>
+                                        <input type="number" class="form-control form-control-custom" id="amount">
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <button class="btn btn-custom btn-block" onclick="convertCurrency()">Convert</button>
+                    </div>
+                    <div class="card-footer card-footer-custom">
+                        <p class="fs-3" id="result" style="color: white"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        async function populateCurrencyOptions() {
+            const symbolsResponse = await fetch('https://api.binance.com/api/v3/ticker/price');
+            const symbolsData = await symbolsResponse.json();
+    
+            const fromCurrencySelect = document.getElementById('fromCurrency');
+            const toCurrencySelect = document.getElementById('toCurrency');
+    
+            symbolsData.forEach(symbol => {
+                if (symbol.symbol.endsWith('USDT')) {
+                    const currency = symbol.symbol.replace('USDT', '');
+                    const price = parseFloat(symbol.price).toFixed(2);
+                    const optionFrom = document.createElement('option');
+                    optionFrom.textContent = `${currency} (USD: ${price})`;
+                    optionFrom.value = currency;
+                    fromCurrencySelect.appendChild(optionFrom);
+    
+                    const optionTo = document.createElement('option');
+                    optionTo.textContent = `${currency} (USD: ${price})`;
+                    optionTo.value = currency;
+                    toCurrencySelect.appendChild(optionTo);
+                }
+            });
+        }
+    
+        async function convertCurrency() {
+            const amount = document.getElementById('amount').value;
+            const fromCurrency = document.getElementById('fromCurrency').value;
+            const toCurrency = document.getElementById('toCurrency').value;
+    
+            const fromResponse = await fetch(`https://api.binance.com/api/v3/ticker/price?symbol=${fromCurrency}USDT`);
+            const fromData = await fromResponse.json();
+            const fromPriceInUSD = parseFloat(fromData.price).toFixed(2);
+    
+            const toResponse = await fetch(`https://api.binance.com/api/v3/ticker/price?symbol=${toCurrency}USDT`);
+            const toData = await toResponse.json();
+            const toPriceInUSD = parseFloat(toData.price).toFixed(2);
+    
+            const convertedAmount = (amount * fromPriceInUSD / toPriceInUSD).toFixed(2);
+    
+            document.getElementById('result').innerText = `Result: ${convertedAmount} ${toCurrency}`;
+        }
+    
+        document.addEventListener('DOMContentLoaded', populateCurrencyOptions);
+    </script>
+    {% endblock content %}
+    

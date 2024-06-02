@@ -1,0 +1,149 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} User Profile {% endblock %}
+
+{% block stylesheets %}
+<style>
+    .form-group label {
+        display: block;
+        color: #fff;
+    }
+    .form-control {
+        background-color: #2d2d2d;
+        border: 1px solid #555;
+        color: #fff;
+    }
+    .btn-primary {
+        background-color: #a741f4;
+        border-color: #a741f4;
+    }
+</style>
+{% endblock stylesheets %}
+
+{% block content %}
+<div class="content">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="title">Edit Profile</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-5 pr-md-1">
+                                <div class="form-group">
+                                    <label for="company">Company</label>
+                                    <input type="text" class="form-control" id="company" name="company" value="{{ form.company.value|default:user.userprofile.company }}">
+                                </div>
+                            </div>
+                            <div class="col-md-3 px-md-1">
+                                <div class="form-group">
+                                    <label for="username">Username</label>
+                                    <input type="text" class="form-control" id="username" value="{{ user.username }}" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-4 pl-md-1">
+                                <div class="form-group">
+                                    <label for="email">Email address</label>
+                                    <input type="email" class="form-control" id="email" name="email" value="{{ form.email.value|default:user.email }}">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 pr-md-1">
+                                <div class="form-group">
+                                    <label for="first_name">First Name</label>
+                                    <input type="text" class="form-control" id="first_name" name="first_name" value="{{ form.first_name.value|default:user.first_name }}">
+                                </div>
+                            </div>
+                            <div class="col-md-6 pl-md-1">
+                                <div class="form-group">
+                                    <label for="last_name">Last Name</label>
+                                    <input type="text" class="form-control" id="last_name" name="last_name" value="{{ form.last_name.value|default:user.last_name }}">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="address">Address</label>
+                                    <input type="text" class="form-control" id="address" name="address" value="{{ form.address.value|default:user.userprofile.address }}">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 pr-md-1">
+                                <div class="form-group">
+                                    <label for="city">City</label>
+                                    <input type="text" class="form-control" id="city" name="city" value="{{ form.city.value|default:user.userprofile.city }}">
+                                </div>
+                            </div>
+                            <div class="col-md-4 px-md-1">
+                                <div class="form-group">
+                                    <label for="country">Country</label>
+                                    <input type="text" class="form-control" id="country" name="country" value="{{ form.country.value|default:user.userprofile.country }}">
+                                </div>
+                            </div>
+                            <div class="col-md-4 pl-md-1">
+                                <div class="form-group">
+                                    <label for="postal_code">Postal Code</label>
+                                    <input type="text" class="form-control" id="postal_code" name="postal_code" value="{{ form.postal_code.value|default:user.userprofile.postal_code }}">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="about_me">About Me</label>
+                                    <textarea class="form-control" id="about_me" name="about_me" rows="4">{{ form.about_me.value|default:user.userprofile.about_me }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-fill btn-primary">Save</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card card-user">
+                <div class="card-body">
+                    <p class="card-text">
+                        <div class="author">
+                            <div class="block block-one"></div>
+                            <div class="block block-two"></div>
+                            <div class="block block-three"></div>
+                            <div class="block block-four"></div>
+                            <a href="javascript:void(0)">
+                                <img class="" src="{{ ASSETS_ROOT }}" alt="...">
+                                <h5 class="title">{{ user.username }}</h5>
+                            </a>
+                            <p class="description">
+                                Ceo/Co-Founder
+                            </p>
+                        </div>
+                    </p>
+                    <div class="card-description">
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="button-container">
+                        <button href="javascript:void(0)" class="btn btn-icon btn-round btn-facebook">
+                            <i class="fab fa-facebook"></i>
+                        </button>
+                        <button href="javascript:void(0)" class="btn btn-icon btn-round btn-twitter">
+                            <i class="fab fa-twitter"></i>
+                        </button>
+                        <button href="javascript:void(0)" class="btn btn-icon btn-round btn-google">
+                            <i class="fab fa-google-plus"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block javascripts %}{% endblock javascripts %}

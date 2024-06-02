@@ -1,0 +1,168 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Crypto Currencies{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .symbol-icon {
+        width: 20px; /* Sembol ikonlarının boyutunu ayarlar */
+        height: 20px; /* Sembol ikonlarının boyutunu ayarlar */
+        margin-right: 5px; /* Sembol ikonları ile metin arasında bir boşluk bırakır */
+    }
+
+    .positive-change {
+        color: green; /* Pozitif fiyat değişimleri için yeşil renk */
+    }
+
+    .negative-change {
+        color: red; /* Negatif fiyat değişimleri için kırmızı renk */
+    }
+
+    .change-icon {
+        margin-left: 5px; /* Ok işaretleri ile metin arasında bir boşluk bırakır */
+    }
+
+    .card-title-custom {
+        font-size: 2.5em; /* Yazı boyutunu büyüt */
+        text-align: center;
+        font-weight: bold; /* Yazıyı kalınlaştır */
+    }
+
+    .sortable {
+        cursor: pointer;
+    }
+
+    .sort-btns {
+        display: inline-flex;
+        vertical-align: middle;
+        margin-left: 10px;
+    }
+
+    .sort-btns button {
+        background-color: #007bff; /* Butonların arka plan rengini değiştir */
+        border: none;
+        color: white; /* Butonların yazı rengini beyaz yap */
+        padding: 5px 10px; /* Butonların boyutunu artır */
+        margin: 0 5px;
+        cursor: pointer;
+        font-size: 1em; /* Yazı boyutunu artır */
+        border-radius: 5px; /* Buton kenarlarını yuvarla */
+    }
+
+    .sort-btns button:hover {
+        background-color: #0056b3; /* Butonların hover rengini değiştir */
+    }
+
+    .table-custom th, .table-custom td {
+        text-align: center; /* Tablo içeriğini ortala */
+        vertical-align: middle; /* Dikeyde ortala */
+        border: 1px solid #dee2e6; /* Çizgileri geri ekle */
+    }
+
+    .table-custom {
+        width: 100%; /* Tabloyu genişlet */
+        max-width: 100%; /* Maksimum genişlik */
+        border-left: 1px solid white; /* Sol kenar çizgisini beyaz yap */
+        border-right: 1px solid white; /* Sağ kenar çizgisini beyaz yap */
+    }
+</style>
+{% endblock stylesheets %}
+
+{% block content %}
+<div class="content">
+    <div class="row justify-content-center">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title card-title-custom">CRYPTO CURRENCIES</h4>
+                </div>
+                <div class="card-body">
+                    <table class="table table-striped table-bordered table-custom">
+                        <thead>
+                            <tr>
+                                <th>Sembol <span class="sort-btns"><button onclick="sortTableBy('name', 'asc')"><i class="fas fa-sort-up"></i></button><button onclick="sortTableBy('name', 'desc')"><i class="fas fa-sort-down"></i></button></span></th>
+                                <th>Fiyat <span class="sort-btns"><button onclick="sortTableBy('price', 'asc')"><i class="fas fa-sort-up"></i></button><button onclick="sortTableBy('price', 'desc')"><i class="fas fa-sort-down"></i></button></span></th>
+                                <th>Değişim <span class="sort-btns"><button onclick="sortTableBy('change', 'asc')"><i class="fas fa-sort-up"></i></button><button onclick="sortTableBy('change', 'desc')"><i class="fas fa-sort-down"></i></button></span></th>
+                            </tr>
+                        </thead>
+                        <tbody id="binanceMarketsTableBody">
+                            <!-- Tablo içeriği dinamik olarak buraya eklenecek -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+    let marketsData = [];
+
+    // CoinGecko API'den kripto para verilerini çekmek için bir fonksiyon
+    async function fetchCoinGeckoData() {
+        const response = await axios.get('https://api.coingecko.com/api/v3/coins/markets', {
+            params: {
+                vs_currency: 'usd'
+            }
+        });
+        return response.data;
+    }
+
+    // Piyasa verilerini tabloya ekleyen fonksiyon
+    async function populateBinanceMarketsTable() {
+        const tableBody = document.getElementById('binanceMarketsTableBody');
+        tableBody.innerHTML = ''; // Mevcut içeriği temizle
+
+        marketsData.forEach(market => {
+            const symbol = market.symbol.toUpperCase();
+            const icon = market.image;
+            const price = parseFloat(market.current_price);
+            const formattedPrice = price >= 5 ? price.toFixed(2) : price;
+            const priceChangePercent = parseFloat(market.price_change_percentage_24h).toFixed(2);
+
+            const changeClass = priceChangePercent >= 0 ? 'positive-change' : 'negative-change';
+            const changeIcon = priceChangePercent >= 0 
+                ? `<span class="${changeClass}">+${priceChangePercent}%</span> <i class="fas fa-arrow-up change-icon"></i>` 
+                : `<span class="${changeClass}">${priceChangePercent}%</span> <i class="fas fa-arrow-down change-icon"></i>`;
+
+            const row = document.createElement('tr');
+
+            row.innerHTML = `
+                <td><img src="${icon}" alt="${symbol} icon" class="symbol-icon">${symbol} / USD</td>
+                <td>${formattedPrice}</td>
+                <td>${changeIcon}</td>
+            `;
+            tableBody.appendChild(row);
+        });
+    }
+
+    // Tabloyu verilen kritere göre sıralayan fonksiyon
+    function sortTableBy(criteria, order) {
+        marketsData.sort((a, b) => {
+            if (criteria === 'name') {
+                return order === 'asc' ? a.symbol.localeCompare(b.symbol) : b.symbol.localeCompare(a.symbol);
+            } else if (criteria === 'price') {
+                return order === 'asc' ? a.current_price - b.current_price : b.current_price - a.current_price;
+            } else if (criteria === 'change') {
+                return order === 'asc' 
+                    ? b.price_change_percentage_24h - a.price_change_percentage_24h 
+                    : a.price_change_percentage_24h - b.price_change_percentage_24h;
+            }
+        });
+        populateBinanceMarketsTable();
+    }
+
+    // Sayfa yüklendiğinde CoinGecko piyasa tablosunu oluştur
+    document.addEventListener('DOMContentLoaded', async () => {
+        marketsData = await fetchCoinGeckoData();
+        populateBinanceMarketsTable();
+    });
+</script>
+{% endblock content %}
+
+{% block javascripts %}
+<script src="https://kit.fontawesome.com/a076d05399.js"></script> <!-- Font Awesome Kit -->
+{% endblock javascripts %}

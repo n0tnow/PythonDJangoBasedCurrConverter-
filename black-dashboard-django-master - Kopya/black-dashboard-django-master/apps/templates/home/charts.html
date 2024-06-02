@@ -1,0 +1,71 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Coin Grafikleri{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .chart-container {
+        width: 90%; /* Genişliği artırmak için */
+        margin: auto;
+        text-align: center;
+    }
+    .card {
+        margin: 20px auto;
+        padding: 20px;
+        border: 1px solid #ced4da;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        background-color: #1e1e1e; /* Dark mode background color */
+    }
+    .tradingview-widget-container {
+        margin: 20px auto;
+        width: 100%;
+    }
+    .container {
+        margin-left: 300px; /* Soldan boşluk bırakmak için */
+    }
+</style>
+{% endblock stylesheets %}
+
+{% block content %}
+<div class="container">
+    <h1 class="text-center my-4" style="color: white;">GRAPHS</h1>
+    <div class="chart-container card">
+        <div class="tradingview-widget-container">
+            <div id="tradingview_chart"></div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block javascripts %}
+<script src="https://s3.tradingview.com/tv.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const currentCoin = 'BTCUSD';
+
+        function loadTradingViewWidget(symbol) {
+            if (document.getElementById('tradingview_chart').innerHTML !== "") {
+                document.getElementById('tradingview_chart').innerHTML = "";
+            }
+            new TradingView.widget({
+                "width": "100%",
+                "height": 500,
+                "symbol": symbol,
+                "interval": "D",
+                "timezone": "Etc/UTC",
+                "theme": "dark",
+                "style": "1",
+                "locale": "en",
+                "toolbar_bg": "#1e1e1e", /* Dark mode toolbar background color */
+                "enable_publishing": false,
+                "allow_symbol_change": true,
+                "container_id": "tradingview_chart"
+            });
+        }
+
+        // Initial load
+        loadTradingViewWidget(currentCoin);
+    });
+</script>
+{% endblock javascripts %}

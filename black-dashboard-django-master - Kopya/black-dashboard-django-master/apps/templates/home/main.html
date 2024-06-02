@@ -1,0 +1,330 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Main Page{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .card {
+        margin-bottom: 20px;
+        height: 210px; /* Kartların yüksekliğini ayarlamak için */
+        position: relative;
+        text-align: center; /* Yazıları ortalamak için */
+        overflow: hidden; /* Taşan içeriği gizlemek için */
+        border: 2px solid transparent;
+        box-shadow: 0 0 0 3px rgba(0,0,0,0.1);
+        transition: box-shadow 0.3s ease-in-out;
+    }
+    .currency-name {
+        font-size: 1.2em; /* Yazı puntosunu büyütmek için */
+        text-align: center; /* Yazıları ortalamak için */
+    }
+    .card-header {
+        font-size: 1.5em; /* Başlıkların puntosunu büyütmek için */
+        font-weight: bold;
+        position: relative;
+    }
+    .card-header .symbol {
+        font-size: 0.8em; /* Kısaltmaların yazı boyutunu küçültmek için */
+    }
+    .card-header img {
+        width: 50px;
+        height: 50px;
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        opacity: 0.8; /* Arkaplan olarak görünmesi için opaklık ayarı */
+    }
+    .card-body {
+        position: relative;
+    }
+    .card-settings {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        cursor: pointer;
+    }
+    .delete-button {
+        display: none;
+        position: absolute;
+        top: 50px;
+        right: 10px;
+        font-size: 0.8em;
+        padding: 5px 10px;
+        cursor: pointer;
+    }
+    .modal-body {
+        padding: 1rem 1rem;
+    }
+    .list-group-item {
+        cursor: pointer;
+    }
+    .search-bar1 {
+        background-color: #ffffff; /* Arkaplan rengi */
+        border: 1px solid #ced4da; /* Kenar rengi */
+        color: #000000; /* Yazı rengi */
+        padding: 10px;
+        border-radius: 5px;
+        transition: all 0.3s ease; /* Animasyon eklemek için */
+        width: 80%;
+        max-width: 600px;
+    }
+    .modal-header, .modal-content {
+        background-color: #343a40;
+        color: #fff;
+    }
+    .btn-close {
+        color: #fff;
+    }
+    .positive-change {
+        color: green;
+    }
+    .negative-change {
+        color: red;
+    }
+    .card:hover {
+        box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+    }
+    .card::before {
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        width: calc(100% + 4px);
+        height: calc(100% + 4px);
+        border: 2px solid transparent;
+        border-image: linear-gradient(45deg, turquoise, transparent) 1;
+        transition: all 0.3s;
+        z-index: -1;
+        pointer-events: none;
+    }
+    .custom-search-container {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: #ffffff; /* Arkaplan rengi */
+        padding: 30px;
+        border-radius: 20px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        /*z-index: 900;*/ /* Modalın üstünde yer alması için */
+        width: 80%;
+        max-width: 700px;
+        text-align: center;
+    }
+    .custom-search-container input {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ced4da;
+        border-radius: 10px;
+        text-align: center;
+    }
+    .custom-search-container .list-group {
+        max-height: 200px; /* Kaydırılabilir bir liste oluşturmak için */
+        overflow-y: auto;
+        margin-top: 10px;
+        text-align: center;
+    }
+    .custom-search-container .list-group-item {
+        background-color: #ffffff; /* Arkaplan rengi */
+        color: #000000; /* Yazı rengi */
+    }
+    .custom-search-container .list-group-item:hover {
+        background-color: #f8f9fa; /* Hover arkaplan rengi */
+    }
+    .custom-search-container .close-button {
+        position: absolute;
+        top: 1px;
+        right: 13px;
+        cursor: pointer;
+        font-size: 2em;
+        color: #000;
+    }
+    .more-info-button {
+        position: absolute;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: inline-block;
+        padding: 10px 15px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        text-decoration: none;
+        font-size: 1em;
+    }
+    .more-info-button:hover {
+        background-color: #0056b3;
+        text-decoration: none;
+        color: white;
+    }
+</style>
+{% endblock stylesheets %}
+
+{% block content %}
+<div class="container" style="margin-left: 300px;">
+    <h1 class="text-center my-4">DASHBOARD</h1>
+
+    <button id="addCardBtn" class="btn btn-primary mb-3">Add Card</button>
+    <div id="cardContainer" class="row">
+        <!-- Kartlar buraya eklenecek -->
+    </div>
+</div>
+
+<div id="customSearchContainer" class="custom-search-container" style="display: none;">
+    <div class="close-button" onclick="closeSearch()">×</div>
+    <input type="text" id="cryptoSearch" class="search-bar1" placeholder="Search for cryptocurrency...">
+    <ul id="searchResults" class="list-group mt-2">
+        <!-- Arama sonuçları buraya eklenecek -->
+    </ul>
+</div>
+{% endblock content %}
+
+{% block javascripts %}
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        let cardIdCounter = 0;
+        const fixedCards = ['Dollar', 'Euro', 'Sterling'];
+
+        async function fetchCurrencyData() {
+            try {
+                const response = await axios.get('https://api.exchangerate-api.com/v4/latest/USD');
+                const data = response.data.rates;
+                return data;
+            } catch (error) {
+                console.error('Error fetching currency data:', error);
+                return null;
+            }
+        }
+
+        async function fetchCryptoData(cryptoIds) {
+            try {
+                const response = await axios.get(`https://api.coingecko.com/api/v3/simple/price?ids=${cryptoIds.join()}&vs_currencies=usd&include_24hr_change=true`);
+                const data = response.data;
+                return data;
+            } catch (error) {
+                console.error('Error fetching crypto data:', error);
+                return null;
+            }
+        }
+
+        async function renderCurrencyCard(cardId, name, symbol, buy, sell, current) {
+            const fixed = fixedCards.includes(name);
+            const cardHtml = `
+                <div class="col-md-4" id="card-${cardId}">
+                    <div class="card">
+                        <div class="card-header">
+                            ${name}
+                            <div class="symbol">${symbol}</div>
+                            ${!fixed ? `<i class="fas fa-cog card-settings" onclick="toggleDeleteButton(${cardId})"></i>` : ''}
+                            ${!fixed ? `<button class="btn btn-danger delete-button" id="delete-${cardId}" onclick="removeCard(${cardId})">Delete</button>` : ''}
+                        </div>
+                        <div class="card-body">
+                            <p class="currency-name">Alış: <span>${buy.toFixed(2)}</span> TL</p>
+                            <p class="currency-name">Satış: <span>${sell.toFixed(2)}</span> TL</p>
+                            <p class="currency-name">Güncel Fiyat: <span>${current.toFixed(2)}</span> TL</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('cardContainer').insertAdjacentHTML('beforeend', cardHtml);
+        }
+
+        async function renderCryptoCard(cardId, name, symbol, iconUrl, price, change) {
+            const fixed = fixedCards.includes(name);
+            const formattedPrice = price < 10 ? price.toFixed(4) : price.toFixed(2);
+            const changeClass = change >= 0 ? 'positive-change' : 'negative-change';
+            const changeIcon = change >= 0 
+                ? `<span class="${changeClass}">+${change.toFixed(2)}%</span> <i class="fas fa-arrow-up change-icon"></i>` 
+                : `<span class="${changeClass}">${change.toFixed(2)}%</span> <i class="fas fa-arrow-down change-icon"></i>`;
+            const cardHtml = `
+                <div class="col-md-4" id="card-${cardId}">
+                    <div class="card">
+                        <div class="card-header">
+                            ${name}
+                            <div class="symbol">${symbol}</div>
+                            ${!fixed ? `<i class="fas fa-cog card-settings" onclick="toggleDeleteButton(${cardId})"></i>` : ''}
+                            ${!fixed ? `<button class="btn btn-danger delete-button" id="delete-${cardId}" onclick="removeCard(${cardId})">Delete</button>` : ''}
+                            <img src="${iconUrl}" alt="${name}">
+                        </div>
+                        <div class="card-body">
+                            <p class="currency-name">Fiyat: <span>${formattedPrice}</span> USD</p>
+                            <p class="currency-name">${changeIcon}</p>
+                            <a href="https://www.coingecko.com/en/coins/${name.toLowerCase()}" class="more-info-button" target="_blank">Daha Fazla</a>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('cardContainer').insertAdjacentHTML('beforeend', cardHtml);
+        }
+
+        document.getElementById('addCardBtn').addEventListener('click', () => {
+            const searchContainer = document.getElementById('customSearchContainer');
+            searchContainer.style.display = 'block';
+        });
+
+        document.getElementById('cryptoSearch').addEventListener('input', async (event) => {
+            const query = event.target.value.toLowerCase();
+            if (query.length > 2) {
+                const response = await axios.get(`https://api.coingecko.com/api/v3/search?query=${query}`);
+                const results = response.data.coins;
+                const resultsContainer = document.getElementById('searchResults');
+                resultsContainer.innerHTML = '';
+                results.forEach(result => {
+                    const listItem = document.createElement('li');
+                    listItem.classList.add('list-group-item');
+                    listItem.textContent = result.name;
+                    listItem.addEventListener('click', () => {
+                        addCryptoCard(result.id, result.name, result.symbol.toUpperCase(), result.large);
+                        const searchContainer = document.getElementById('customSearchContainer');
+                        searchContainer.style.display = 'none';
+                    });
+                    resultsContainer.appendChild(listItem);
+                });
+            }
+        });
+
+        async function addCryptoCard(id, name, symbol, iconUrl) {
+            const cryptoData = await fetchCryptoData([id]);
+            renderCryptoCard(cardIdCounter++, name, symbol, iconUrl, cryptoData[id].usd, cryptoData[id].usd_24h_change);
+        }
+
+        window.removeCard = function(cardId) {
+            const cardElement = document.getElementById(`card-${cardId}`);
+            cardElement.parentNode.removeChild(cardElement);
+        }
+
+        window.toggleDeleteButton = function(cardId) {
+            const deleteButton = document.getElementById(`delete-${cardId}`);
+            if (deleteButton.style.display === 'none' || deleteButton.style.display === '') {
+                deleteButton.style.display = 'block';
+            } else {
+                deleteButton.style.display = 'none';
+            }
+        }
+
+        window.closeSearch = function() {
+            const searchContainer = document.getElementById('customSearchContainer');
+            searchContainer.style.display = 'none';
+        }
+
+        // Initial rendering of some predefined cards
+        async function init() {
+            const currencyData = await fetchCurrencyData();
+            renderCurrencyCard(cardIdCounter++, 'Dollar', 'USD', currencyData['TRY'], currencyData['TRY'] * 1.02, currencyData['TRY']);
+            renderCurrencyCard(cardIdCounter++, 'Euro', 'EUR', currencyData['TRY'] / currencyData['EUR'], (currencyData['TRY'] / currencyData['EUR']) * 1.02, currencyData['TRY'] / currencyData['EUR']);
+            renderCurrencyCard(cardIdCounter++, 'Sterling', 'GBP', currencyData['TRY'] / currencyData['GBP'], (currencyData['TRY'] / currencyData['GBP']) * 1.02, currencyData['TRY'] / currencyData['GBP']);
+
+            // Render fixed crypto cards
+            const cryptoData = await fetchCryptoData(['bitcoin', 'ethereum', 'solana']);
+            renderCryptoCard(cardIdCounter++, 'Bitcoin', 'BTC', 'https://cryptologos.cc/logos/bitcoin-btc-logo.svg?v=022', cryptoData.bitcoin.usd, cryptoData.bitcoin.usd_24h_change);
+            renderCryptoCard(cardIdCounter++, 'Ethereum', 'ETH', 'https://cryptologos.cc/logos/ethereum-eth-logo.svg?v=022', cryptoData.ethereum.usd, cryptoData.ethereum.usd_24h_change);
+            renderCryptoCard(cardIdCounter++, 'Solana', 'SOL', 'https://cryptologos.cc/logos/solana-sol-logo.svg?v=022', cryptoData.solana.usd, cryptoData.solana.usd_24h_change);
+        }
+
+        init();
+    });
+</script>
+{% endblock javascripts %}

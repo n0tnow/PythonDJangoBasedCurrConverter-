@@ -1,0 +1,194 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Currency Converter{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .card-custom {
+        background-color: #333; /* Kartın arka plan rengini koyu gri yaptım */
+        border: 1px solid #555; /* Kartın kenar rengini koyu gri yaptım */
+        border-radius: 15px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.5); /* Kartın gölgesini biraz daha belirgin yaptım */
+        position: relative;
+        overflow: hidden;
+        color: #fff; /* Karttaki yazıların rengini beyaz yaptım */
+        width: 100%;
+        max-width: 400px;
+        margin: 0 auto;
+        z-index: 1;
+    }
+    .card-header-custom {
+        background-color: #A439CC;
+        color: #fff; /* Başlık yazı rengini beyaz yaptım */
+        border-bottom: 0px solid #0056b3;
+        border-radius: 15px 15px 0 0;
+        text-align: center;
+        z-index: 2;
+        position: relative;
+        font-size: 8em; /* Başlığın yazı boyutunu büyüttüm */
+        font-weight: bold;
+        /*animation: animateText 3s linear infinite; /* Başlığa animasyon ekledim */*/
+    }
+    @keyframes animateText {
+        0% {
+            text-shadow: 0 0 10px #fff, 0 0 20px #ff00ff, 0 0 30px #ff00ff, 0 0 40px #ff00ff, 0 0 50px #ff00ff, 0 0 60px #ff00ff, 0 0 70px #ff00ff;
+        }
+        100% {
+            text-shadow: 0 0 20px #fff, 0 0 30px #ff00ff, 0 0 40px #ff00ff, 0 0 50px #ff00ff, 0 0 60px #ff00ff, 0 0 70px #ff00ff, 0 0 80px #ff00ff;
+        }
+    }
+    .card-body-custom {
+        padding: 20px;
+        z-index: 2;
+        position: relative;
+    }
+    .form-control-custom {
+        font-size: smaller;
+        margin-bottom: 10px;
+        background-color: #555; /* Giriş kutularının arka plan rengini koyu gri yaptım */
+        color: #fff; /* Giriş kutularındaki yazı rengini beyaz yaptım */
+        border: 1px solid #777; /* Giriş kutularının kenar rengini koyu gri yaptım */
+        text-align: center;
+    }
+    .form-control-custom option {
+        background-color: #333; /* Seçeneklerin arka plan rengini koyu gri yaptım */
+        color: #fff; /* Seçeneklerin yazı rengini beyaz yaptım */
+    }
+    .btn-custom {
+        background-color: #28a745;
+        border-color: #28a745;
+    }
+    .btn-custom:hover {
+        background-color: #218838;
+        border-color: #1e7e34;
+    }
+    .card-footer-custom {
+        background-color: #444; /* Altbilgi arka plan rengini koyu gri yaptım */
+        border-top: 2px solid #555; /* Altbilgi kenar rengini koyu gri yaptım */
+        border-radius: 0 0 15px 15px;
+        text-align: center;
+        color: #fff; /* Altbilgi yazı rengini beyaz yaptım */
+        z-index: 2;
+        position: relative;
+    }
+    .card-custom::before, .card-custom::after {
+        content: '';
+        position: absolute;
+        width: 200%;
+        height: 200%;
+        border-radius: 15px;
+        border: 2px solid transparent;
+        box-shadow: 0 0 30px 20px rgba(0, 255, 255, 0.7);
+        z-index: -1;
+        transition: all 0.5s;
+    }
+    .card-custom::before {
+        top: -50%;
+        left: -50%;
+        animation: borderAnimation 3s linear infinite;
+    }
+    .card-custom::after {
+        top: -50%;
+        right: -50%;
+        animation: borderAnimation 3s linear infinite reverse;
+    }
+    @keyframes borderAnimation {
+        0% {
+            box-shadow: 0 0 30px 10px rgba(0, 255, 255, 0.7);
+        }
+        50% {
+            box-shadow: 0 0 50px 30px rgba(0, 255, 255, 0.9);
+        }
+        100% {
+            box-shadow: 0 0 30px 10px rgba(0, 255, 255, 0.7);
+        }
+    }
+</style>
+{% endblock stylesheets %}
+
+{% block content %}
+<div class="container justify-content-center" style="margin-top: 120px;">
+    <div class="row justify-content-center" style="text-align: center;">
+        <div class="col-md-6">
+            <div class="card card-custom">
+                <div class="card-header card-header-custom">
+                    <h5 class="card-title"style="font-weight: bold;font-size:20px;">Currency Converter</h5>
+                </div>
+                <div class="card-body card-body-custom">
+                    <table class="table">
+                        <tbody>
+                            <tr>
+                                <td style="font-weight: bold; color: #fff; font-size: 15px;">From</td>
+                                <td>
+                                    <select class="form-control form-control-custom" id="fromCurrency">
+                                        <!-- Options will be added dynamically using JavaScript -->
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="font-weight: bold; color: #fff; font-size: 15px;">To</td>
+                                <td>
+                                    <select class="form-control form-control-custom" id="toCurrency">
+                                        <!-- Options will be added dynamically using JavaScript -->
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="font-weight: bold; color: #fff; font-size: 15px;">Amount</td>
+                                <td>
+                                    <input type="number" class="form-control form-control-custom" id="amount">
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <button class="btn btn-custom btn-block" onclick="convertCurrency()">Convert</button>
+                </div>
+                <div class="card-footer card-footer-custom">
+                    <p class="fs-3" id="result" style="color: white"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    async function fetchExchangeRates() {
+        const response = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
+        const data = await response.json();
+        return data;
+    }
+
+    async function populateCurrencyOptions() {
+        const exchangeRates = await fetchExchangeRates();
+        const currencies = Object.keys(exchangeRates.rates);
+
+        const fromCurrencySelect = document.getElementById('fromCurrency');
+        const toCurrencySelect = document.getElementById('toCurrency');
+
+        currencies.forEach(currency => {
+            const option = document.createElement('option');
+            option.value = currency;
+            option.text = currency;
+            fromCurrencySelect.appendChild(option.cloneNode(true));
+            toCurrencySelect.appendChild(option);
+        });
+    }
+
+    async function convertCurrency() {
+        const fromCurrency = document.getElementById('fromCurrency').value;
+        const toCurrency = document.getElementById('toCurrency').value;
+        const amount = document.getElementById('amount').value;
+
+        const response = await fetch(`https://api.exchangerate-api.com/v4/latest/${fromCurrency}`);
+        const data = await response.json();
+        const rate = data.rates[toCurrency];
+
+        const convertedAmount = (amount * rate).toFixed(2);
+
+        document.getElementById('result').innerText = `${amount} ${fromCurrency} = ${convertedAmount} ${toCurrency}`;
+    }
+
+    populateCurrencyOptions();
+</script>
+{% endblock content %}
+

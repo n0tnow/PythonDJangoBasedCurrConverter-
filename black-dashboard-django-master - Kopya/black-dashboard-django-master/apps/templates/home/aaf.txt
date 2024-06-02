@@ -1,0 +1,196 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Main Page {% endblock %}
+
+{% block stylesheets %}
+<style>
+    .card {
+        margin-bottom: 20px;
+        height: 175px; /* Kartların yüksekliğini sabitlemek için */
+    }
+    .currency-name {
+        font-size: 1.2em; /* Yazı puntosunu büyütmek için */
+        text-align: left; /* Yazıları sola sabitlemek için */
+    }
+    .card-header img {
+        width: 30px;
+        height: 30px;
+        float: right;
+    }
+    .card-body {
+        position: relative;
+    }
+</style>
+{% endblock stylesheets %}
+
+{% block content %}
+<div class="container" style="margin-left: 300px;">
+    <h1 class="text-center my-4">Currency Dashboard</h1>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header text-center">
+                    Dollar
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/US_Dollar_Logo.svg/1200px-US_Dollar_Logo.svg.png" alt="Dollar">
+                </div>
+                <div class="card-body">
+                    <p class="currency-name">Alış: <span id="usd-buy" class="currency-rate"></span> TL</p>
+                    <p class="currency-name">Satış: <span id="usd-sell" class="currency-rate"></span> TL</p>
+                    <p class="currency-name">Güncel Fiyat: <span id="usd-current" class="currency-rate"></span> TL</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header text-center">
+                    Euro
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/b/b7/Euro_symbol.svg" alt="Euro">
+                </div>
+                <div class="card-body">
+                    <p class="currency-name">Alış: <span id="eur-buy" class="currency-rate"></span> TL</p>
+                    <p class="currency-name">Satış: <span id="eur-sell" class="currency-rate"></span> TL</p>
+                    <p class="currency-name">Güncel Fiyat: <span id="eur-current" class="currency-rate"></span> TL</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header text-center">
+                    Sterling
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/0/0e/British_pound_sign.svg" alt="Sterling">
+                </div>
+                <div class="card-body">
+                    <p class="currency-name">Alış: <span id="gbp-buy" class="currency-rate"></span> TL</p>
+                    <p class="currency-name">Satış: <span id="gbp-sell" class="currency-rate"></span> TL</p>
+                    <p class="currency-name">Güncel Fiyat: <span id="gbp-current" class="currency-rate"></span> TL</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header text-center">
+                    Bitcoin
+                    <img src="https://cryptologos.cc/logos/bitcoin-btc-logo.svg?v=022" alt="Bitcoin">
+                </div>
+                <div class="card-body">
+                    <p class="currency-name">Fiyat: <span id="btc-price" class="currency-rate"></span> USD</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header text-center">
+                    Ethereum
+                    <img src="https://cryptologos.cc/logos/ethereum-eth-logo.svg?v=022" alt="Ethereum">
+                </div>
+                <div class="card-body">
+                    <p class="currency-name">Fiyat: <span id="eth-price" class="currency-rate"></span> USD</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header text-center">
+                    Dogecoin
+                    <img src="https://cryptologos.cc/logos/dogecoin-doge-logo.svg?v=022" alt="Dogecoin">
+                </div>
+                <div class="card-body">
+                    <p class="currency-name">Fiyat: <span id="doge-price" class="currency-rate"></span> USD</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header text-center">
+                    Solana
+                    <img src="https://cryptologos.cc/logos/solana-sol-logo.svg?v=022" alt="Solana">
+                </div>
+                <div class="card-body">
+                    <p class="currency-name">Fiyat: <span id="sol-price" class="currency-rate"></span> USD</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header text-center">
+                    BNB
+                    <img src="https://cryptologos.cc/logos/bnb-bnb-logo.svg?v=022" alt="BNB">
+                </div>
+                <div class="card-body">
+                    <p class="currency-name">Fiyat: <span id="bnb-price" class="currency-rate"></span> USD</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header text-center">
+                    XRP
+                    <img src="https://cryptologos.cc/logos/xrp-xrp-logo.svg?v=022" alt="XRP" style="background-color: white;">
+                </div>
+                <div class="card-body">
+                    <p class="currency-name">Fiyat: <span id="xrp-price" class="currency-rate"></span> USD</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block javascripts %}
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        async function fetchCurrencyData() {
+            try {
+                const response = await axios.get('https://api.exchangerate-api.com/v4/latest/USD');
+                const data = response.data.rates;
+                return data;
+            } catch (error) {
+                console.error('Error fetching currency data:', error);
+                return null;
+            }
+        }
+
+        async function fetchCryptoData() {
+            try {
+                const response = await axios.get('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,dogecoin,solana,binancecoin,ripple&vs_currencies=usd');
+                const data = response.data;
+                return data;
+            } catch (error) {
+                console.error('Error fetching crypto data:', error);
+                return null;
+            }
+        }
+
+        async function renderCurrencyCards() {
+            const currencyData = await fetchCurrencyData();
+            const cryptoData = await fetchCryptoData();
+
+            if (currencyData) {
+                document.getElementById('usd-buy').textContent = currencyData['TRY'].toFixed(2);
+                document.getElementById('usd-sell').textContent = (currencyData['TRY'] * 1.02).toFixed(2);
+                document.getElementById('usd-current').textContent = currencyData['TRY'].toFixed(2);
+
+                document.getElementById('eur-buy').textContent = (currencyData['TRY'] / currencyData['EUR']).toFixed(2);
+                document.getElementById('eur-sell').textContent = ((currencyData['TRY'] / currencyData['EUR']) * 1.02).toFixed(2);
+                document.getElementById('eur-current').textContent = (currencyData['TRY'] / currencyData['EUR']).toFixed(2);
+
+                document.getElementById('gbp-buy').textContent = (currencyData['TRY'] / currencyData['GBP']).toFixed(2);
+                document.getElementById('gbp-sell').textContent = ((currencyData['TRY'] / currencyData['GBP']) * 1.02).toFixed(2);
+                document.getElementById('gbp-current').textContent = (currencyData['TRY'] / currencyData['GBP']).toFixed(2);
+            }
+
+            if (cryptoData) {
+                document.getElementById('btc-price').textContent = cryptoData.bitcoin.usd.toFixed(2);
+                document.getElementById('eth-price').textContent = cryptoData.ethereum.usd.toFixed(2);
+                document.getElementById('doge-price').textContent = cryptoData.dogecoin.usd.toFixed(2);
+                document.getElementById('sol-price').textContent = cryptoData.solana.usd.toFixed(2);
+                document.getElementById('bnb-price').textContent = cryptoData.binancecoin.usd.toFixed(2);
+                document.getElementById('xrp-price').textContent = cryptoData.ripple.usd.toFixed(2);
+            }
+        }
+
+        renderCurrencyCards();
+    });
+</script>
+{% endblock javascripts %}

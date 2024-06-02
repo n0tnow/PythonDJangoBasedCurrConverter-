@@ -1,0 +1,143 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Notifications{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .news-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .news-card {
+        display: flex;
+        align-items: center;
+        margin-left: 200px;
+        margin-bottom: 20px;
+        padding: 20px;
+        width: 100%; /* Kartları genişlet */
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+        position: relative;
+    }
+
+    .news-card:hover {
+        transform: scale(1.05);
+    }
+
+    .news-card img {
+        width: 150px;
+        height: 150px;
+        margin-right: 20px;
+        border-radius: 10px;
+    }
+
+    .news-card-body {
+        flex: 1;
+    }
+
+    .news-card-title {
+        font-size: 1.5em;
+        margin-bottom: 10px;
+        font-weight: bold;
+        color: black; /* Başlık yazı rengi düzeltildi */
+    }
+
+    .news-card-text {
+        font-size: 1.2em;
+        margin-bottom: 10px;
+        color: #555;
+    }
+
+    .news-card-button {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        display: inline-block;
+        padding: 10px 15px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        text-decoration: none;
+        font-size: 1em;
+    }
+
+    .news-card-button:hover {
+        background-color: #0056b3;
+        text-decoration: none;
+        color: white;
+    }
+</style>
+{% endblock stylesheets %}
+
+{% block content %}
+<div class="container">
+    <h1 class="text-center my-4"style="margin-left:100px;">Crypto and Currency News</h1>
+    <div class="news-container">
+        <!-- News Card 1 -->
+        <div class="news-card">
+            <img src="https://via.placeholder.com/150" alt="News Image">
+            <div class="news-card-body">
+                <h5 class="news-card-title">News Title 1</h5>
+                <p class="news-card-text">Brief description of the news goes here.</p>
+                <a href="#" class="news-card-button" target="_blank">Read More</a>
+            </div>
+        </div>
+        <!-- News Card 2 -->
+        <div class="news-card">
+            <img src="https://via.placeholder.com/150" alt="News Image">
+            <div class="news-card-body">
+                <h5 class="news-card-title">News Title 2</h5>
+                <p class="news-card-text">Brief description of the news goes here.</p>
+                <a href="#" class="news-card-button" target="_blank">Read More</a>
+            </div>
+        </div>
+        <!-- News Card 3 -->
+        <div class="news-card">
+            <img src="https://via.placeholder.com/150" alt="News Image">
+            <div class="news-card-body">
+                <h5 class="news-card-title">News Title 3</h5>
+                <p class="news-card-text">Brief description of the news goes here.</p>
+                <a href="#" class="news-card-button" target="_blank">Read More</a>
+            </div>
+        </div>
+        <!-- News Card 4 -->
+        <div class="news-card">
+            <img src="https://via.placeholder.com/150" alt="News Image">
+            <div class="news-card-body">
+                <h5 class="news-card-title">News Title 4</h5>
+                <p class="news-card-text">Brief description of the news goes here.</p>
+                <a href="#" class="news-card-button" target="_blank">Read More</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block javascripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        const newsContainer = document.querySelector('.news-container');
+        
+        // Fetch news data from CoinGecko
+        const response = await fetch('https://api.coingecko.com/api/v3/news');
+        const data = await response.json();
+        const articles = data.data.slice(0, 4); // Get the first 4 articles
+
+        // Populate news cards with data
+        const newsCards = newsContainer.querySelectorAll('.news-card');
+        articles.forEach((article, index) => {
+            const newsCard = newsCards[index];
+            newsCard.querySelector('img').src = article.thumb_2x || 'https://via.placeholder.com/150';
+            newsCard.querySelector('.news-card-title').textContent = article.title;
+            newsCard.querySelector('.news-card-text').textContent = article.description;
+            newsCard.querySelector('.news-card-button').href = article.url;
+        });
+    });
+</script>
+{% endblock javascripts %}
